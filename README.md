@@ -1,1 +1,1 @@
-# pis-workshop-2022
+# PIS 2022 - Workshops
