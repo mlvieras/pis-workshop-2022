@@ -1,5 +1,20 @@
 version: "3"
 services:
+  rails-workshop:
+    env_file: ./rails-workshop/.env.development
+    build:
+      context: ./rails-workshop
+      dockerfile: Dockerfile
+    container_name: rails-workshop
+    volumes:
+      - ./rails-workshop:/app
+      - bundle_cache:/bundle
+    ports:
+      - "3001:3000"
+    depends_on:
+      - database
+    tty: true
+    stdin_open: true
   database:
     image: postgres:14-alpine
     environment:
@@ -9,7 +24,19 @@ services:
       - ./db:/var/lib/postgresql/data
     ports:
       - 5432:5432
+  web:
+    build:
+      context: ./react-workshop
+      dockerfile: Dockerfile
+    volumes:
+      - type: bind
+        source: ./react-workshop
+        target: /code
+    stdin_open: true
+    ports:
+      - 3000:3000
 volumes:
   db:
     driver: local
+  bundle_cache:
 

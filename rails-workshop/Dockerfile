@@ -1,22 +1,15 @@
 FROM ruby:3.1.1
 
-RUN gem install bundler -v 2.3.7
+RUN gem install bundler -v 2.3.7 && \
+    apt-get update && \
+    apt-get install -y ffmpeg libvips
 
-# Change user to avoid running commands with root user.
-RUN groupadd --gid 1000 ruby \
-  && useradd --uid 1000 --gid ruby --shell /bin/bash --create-home ruby
+WORKDIR /app
 
-WORKDIR /code
+ENV BUNDLE_PATH=/bundle \
+    BUNDLE_BIN=/bundle/bin \
+    GEM_HOME=/bundle
+ENV PATH="${BUNDLE_BIN}:${PATH}"
 
-COPY --chown=ruby:ruby . .
-
-RUN bundle install
-
-USER ruby
-EXPOSE 3000
-
-ENV RAILS_ENV=production
-
-CMD rm -f tmp/pids/server.pid && \
-  bundle exec rails db:migrate && \
-  bundle exec puma -p 3000
+# Start the main process.
+CMD ["./run.sh"]
